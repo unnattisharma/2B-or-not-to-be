@@ -9,6 +9,7 @@ import tkinter as tk
 import random
 from PIL import Image, ImageTk
 import glob
+from tkinter import messagebox
 
 # Function to update the counter and list for Button 1
 def increment_button1():
@@ -18,7 +19,10 @@ def increment_button1():
         list1.insert(tk.END, text)
         entry.delete(0, tk.END)
         count1 += 1
-        label1.config(text=f"{count1} times today")
+        print("increment button 1 update labels")
+        update_labels()
+        penguin_box.delete("1.0", tk.END)
+        penguin_box.insert(tk.END, random.choice(positive_penguin_text))
     return
 
 # Function to update the counter and list for Button 2
@@ -29,7 +33,10 @@ def increment_button2():
         list2.insert(tk.END, text)
         entry.delete(0, tk.END)
         count2 += 1
-        label2.config(text=f"{count2} times today")
+        print("increment button 2 update labels")
+        update_labels()
+        penguin_box.delete("1.0", tk.END)
+        penguin_box.insert(tk.END, random.choice(negative_penguin_text))
     return
     
 def focus_out(entry):
@@ -39,6 +46,65 @@ def focus_out(entry):
         new_text = ''
     return entry.insert(0, new_text)
 
+def save_all():
+    global list1_vals, list2_vals
+    list1_vals = list(list1.get(0, tk.END))
+    list2_vals = list(list2.get(0, tk.END))
+    
+    try:
+        with open('previous.txt','w') as f:
+                f.write(str(count1)+'\n')
+                [f.write(lv1+',') for lv1 in list1_vals[0:-1]]
+                f.write(list1_vals[-1]+'\n')
+                f.write(str(count2)+'\n')
+                [f.write(lv2+',') for lv2 in list2_vals[0:-1]]
+                f.write(list2_vals[-1]+'\n')
+    except:
+        messagebox.showerror("Error", "Could not save data")
+            
+    root.destroy()    
+    return
+
+def load_day():
+    global count1, count2
+    try:
+        with open('previous.txt', 'r') as f:
+            prev_data = f.readlines()
+        count1 += int(prev_data[0].strip())
+        count2 += int(prev_data[2].strip())
+        [list1.insert(tk.END, text) for text in prev_data[1].strip().split(',')]
+        [list2.insert(tk.END, text) for text in prev_data[3].strip().split(',')]
+        print("load data update labels")
+        update_labels()
+    except:
+        messagebox.showerror("Error", "Could not load data")
+    return
+
+def delete_entry_list1():
+    global count1
+    selected_index = list1.curselection()
+    list1.delete(selected_index)
+    count1 -= 1
+    print("delete entry update labels")
+    update_labels()
+    return
+
+def delete_entry_list2():
+    global count2
+    selected_index = list2.curselection()
+    list2.delete(selected_index)
+    count2 -= 1
+    print("delete entry update labels")
+    update_labels()
+    return
+
+def update_labels():
+    global count1, count2
+    print("updating labels")
+    label1.config(text=f"{count1} times today")
+    label2.config(text=f"{count2} times today")
+    return
+
 def finish_day():
     if count1 >= count2:
         message = random.choice(successful_day_messages)
@@ -46,59 +112,36 @@ def finish_day():
     elif count1 < count2:
         message = random.choice(unsuccessful_day_messages)
         image_path = random.choice(loser_images)
-    text_display = tk.Text(root, height=30, width=30)
-    text_display.pack(pady=10)
-    text_display.insert(tk.END, message)
+    top= tk.Toplevel(root)
+    top.geometry("300x400")
+    top.title("Day Finished")
+    print(message)
     image = Image.open(image_path)
     image = image.resize((200, 200), Image.ANTIALIAS)  # Resize image if needed
     photo = ImageTk.PhotoImage(image)
-
-    # Insert the image into the Text widget
-    text_display.image_create(tk.END, image=photo)
-    text_display.image = photo
-    return
-
-def save_all():
-    global list1_vals, list2_vals
-    list1_vals = list(list1.get(0, tk.END))
-    list2_vals = list(list2.get(0, tk.END))
-    
-    with open('previous.txt','w') as f:
-            f.write(str(count1)+'\n')
-            [f.write(lv1+',') for lv1 in list1_vals[0:-1]]
-            f.write(list1_vals[-1]+'\n')
-            f.write(str(count2)+'\n')
-            [f.write(lv2+',') for lv2 in list2_vals[0:-1]]
-            f.write(list2_vals[-1]+'\n')
-            
-    root.destroy()    
-    return
-
-def load_day():
-    global count1, count2
-    with open('previous.txt', 'r') as f:
-        prev_data = f.readlines()
-    count1 += int(prev_data[0].strip())
-    count2 += int(prev_data[2].strip())
-    [list1.insert(tk.END, text) for text in prev_data[1].strip().split(',')]
-    [list2.insert(tk.END, text) for text in prev_data[3].strip().split(',')]
-    label1.config(text=f"{count1} times today")
-    label2.config(text=f"{count2} times today")
-    return
-
-def delete_entry(selected):
+    message_disp = tk.Label(top, text= message, font=('Mistral 18 bold'))
+    message_disp.pack()
+    image_disp = tk.Label(top, image=photo, font=('Mistral 18 bold'))
+    image_disp.pack()
+    image_disp.image = photo
     return
     
 
 placeholder = 'Decision'
-with open('successful_day_messages.txt','r') as f:
+with open('messages/successful_day_messages.txt','r') as f:
     successful_day_messages=[m.strip() for m in f.readlines()]
     
-with open('unsuccessful_day_messages.txt','r') as f:
+with open('messages/unsuccessful_day_messages.txt','r') as f:
     unsuccessful_day_messages=[m.strip() for m in f.readlines()]
 
-winner_images = glob.glob('winner_images/*')
-loser_images = glob.glob('loser_images/*')
+winner_images = glob.glob('images/winner_images/*')
+loser_images = glob.glob('images/loser_images/*')
+
+with open('messages/positive_penguin_text.txt','r') as f:
+    positive_penguin_text=[m.strip() for m in f.readlines()]
+    
+with open('messages/negative_penguin_text.txt','r') as f:
+    negative_penguin_text=[m.strip() for m in f.readlines()]
 
 # Initialize counters
 count1 = 0
@@ -155,9 +198,26 @@ label2.pack()
 list2 = tk.Listbox(root)
 list2.pack()
 
-#list1_vals = list1.get(0, tk.END)
 root.protocol("WM_DELETE_WINDOW", save_all)
+list1.bind("<Delete>", lambda args: delete_entry_list1())
+list2.bind("<Delete>", lambda args: delete_entry_list2())
 
+penguin_image = Image.open('images/working-penguin.jpg')
+penguin_image = penguin_image.resize((120, 180), Image.ANTIALIAS)  # Resize image if needed
+penguin_photo = ImageTk.PhotoImage(penguin_image)
+penguin_panel = tk.Label(root, image = penguin_photo)
+penguin_panel.pack(padx=10, side=tk.LEFT)
+
+penguin_box = tk.Text(root, height=10, width=15, wrap=tk.WORD)
+penguin_box.pack(padx = 10, side=tk.LEFT)
+penguin_box.insert(tk.END, "Hi!")
+    
 # Run the application
 root.mainloop()
 
+"""
+Upcomng updates:
+to-do list
+start new day
+stats
+"""
