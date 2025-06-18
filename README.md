@@ -16,15 +16,15 @@ But it is you who decide what qualifies as a winner/loser action. This is where 
 
 # Running the App
 
-Go to the Github repository and copy the link, then run git clone on your terminal.
+Go to the Github repository and copy the link, then run <git clone> on your terminal.
 
-Learn how to clone a repository here.
+Learn how to clone a repository [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 
 OR
 
 Download the repository and simply run the main.py file with python. (Note: tkinter should work fine with Windows, but there can be some graphics issues with iOS)
 
-Learn how to run a python program on Windows and on mac.
+Learn how to run a python program on [Windows](https://docs.python.org/3/faq/windows.html) and on [mac]([url](https://docs.python.org/3/using/mac.html)).
 
 # Using the App
 
