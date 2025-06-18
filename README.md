@@ -24,7 +24,7 @@ OR
 
 Download the repository and simply run the main.py file with python. (Note: tkinter should work fine with Windows, but there can be some graphics issues with iOS)
 
-Learn how to run a python program on [Windows](https://docs.python.org/3/faq/windows.html) and on [mac]([url](https://docs.python.org/3/using/mac.html)).
+Learn how to run a python program on [Windows](https://docs.python.org/3/faq/windows.html) and on [mac](https://docs.python.org/3/using/mac.html).
 
 # Using the App
 
